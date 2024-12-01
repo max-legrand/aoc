@@ -1,0 +1,4 @@
+
+(library
+ (name log)
+ (libraries base unix stdio))

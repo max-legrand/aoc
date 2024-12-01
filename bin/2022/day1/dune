@@ -1,4 +1,4 @@
 (executable
  (public_name aoc_2022_day1)
  (name main)
- (libraries log))
+ (libraries log utils))

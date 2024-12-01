@@ -1,4 +1,3 @@
-
 # Jane Street style
-profile = janestreet
 version = 0.26.2
+profile = janestreet

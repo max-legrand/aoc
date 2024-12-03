@@ -17,7 +17,7 @@
  (name aoc)
  (synopsis "Advent of Code solutions")
  (description "Advent of Code solutions in OCaml")
- (depends ocaml dune stdio base core)
+ (depends ocaml dune stdio base core re)
 )
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

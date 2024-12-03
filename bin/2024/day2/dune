@@ -1,0 +1,4 @@
+(executable
+ (public_name aoc_2024_day2)
+ (name main)
+ (libraries log utils base core))

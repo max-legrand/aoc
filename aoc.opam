@@ -13,6 +13,7 @@ depends: [
   "stdio"
   "base"
   "core"
+  "re"
   "odoc" {with-doc}
 ]
 build: [

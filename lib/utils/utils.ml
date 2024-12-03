@@ -14,4 +14,5 @@ let read_file (filename : string) : string list =
   read_lines []
 ;;
 
-let print_lines (lines : string list) : unit = List.iter print_endline lines
+let print_str_lines (lines : string list) : unit = List.iter print_endline lines
+let print_int_lines (lines : int list) : unit = List.iter (Printf.printf "%d\n") lines

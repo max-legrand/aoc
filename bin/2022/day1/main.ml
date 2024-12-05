@@ -50,8 +50,8 @@ let top_three (input : string list) : int =
 let main () =
   let input = "bin/2022/day1/data/puzzle.txt" in
   let lines = Utils.read_file input in
-  Log.info (Printf.sprintf "max_calories=%d" (max_calories lines));
-  Log.info (Printf.sprintf "top_three=%d" (top_three lines))
+  Spice.info (Printf.sprintf "max_calories=%d" (max_calories lines));
+  Spice.info (Printf.sprintf "top_three=%d" (top_three lines))
 ;;
 
 main ()

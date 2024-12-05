@@ -87,7 +87,7 @@ let part1 () =
   let total =
     lines |> List.map parse_line_pt1 |> List.fold_left (fun acc x -> acc + x) 0
   in
-  Log.info (Printf.sprintf "Total: %d" total)
+  Spice.info (Printf.sprintf "Total: %d" total)
 ;;
 
 part1 ()
@@ -103,7 +103,7 @@ let parse_line_pt2 (line : string) : int =
 let part2 () =
   let lines = Utils.read_file input in
   let total = lines |> List.map parse_line_pt2 |> List.fold_left ( + ) 0 in
-  Log.info (Printf.sprintf "Total: %d" total)
+  Spice.info (Printf.sprintf "Total: %d" total)
 ;;
 
 part2 ()

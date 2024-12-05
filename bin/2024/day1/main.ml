@@ -1,4 +1,4 @@
-Log.info "2024 Day 1"
+Spice.info "2024 Day 1"
 
 (* let input = "bin/2024/day1/data/test.txt" *)
 let input = "bin/2024/day1/data/puzzle.txt"
@@ -32,7 +32,7 @@ let part1 () =
       sl2
   in
   let result = List.fold_left ( + ) 0 distances in
-  Log.info (Printf.sprintf "Result=%d" result)
+  Spice.info (Printf.sprintf "Result=%d" result)
 ;;
 
 part1 ()
@@ -57,7 +57,7 @@ let part2 () =
            acc + (freq * x))
          0
   in
-  Log.info (Printf.sprintf "Result=%d" result)
+  Spice.info (Printf.sprintf "Result=%d" result)
 ;;
 
 part2 ()

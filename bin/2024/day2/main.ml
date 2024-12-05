@@ -1,4 +1,4 @@
-Log.info "2024 Day 2"
+Spice.info "2024 Day 2"
 
 (* let input = "bin/2024/day2/data/test.txt" *)
 let input = "bin/2024/day2/data/puzzle.txt"
@@ -43,7 +43,7 @@ let is_safe (levels : int list) (dir : direction) : bool =
 let parse_report (line : string) : bool =
   let levels = String.split_on_char ' ' line |> List.map int_of_string in
   let is_report_safe = is_safe levels Increasing || is_safe levels Decreasing in
-  if is_report_safe then Log.debug (Printf.sprintf "Report is safe: %s" line);
+  if is_report_safe then Spice.debug (Printf.sprintf "Report is safe: %s" line);
   is_report_safe
 ;;
 
@@ -52,7 +52,7 @@ let part1 () =
   let res =
     lines |> List.fold_left (fun acc x -> if parse_report x then acc + 1 else acc) 0
   in
-  Log.info (Printf.sprintf "Result: %d" res)
+  Spice.info (Printf.sprintf "Result: %d" res)
 ;;
 
 part1 ()
@@ -80,12 +80,12 @@ let parse_report_fault (line : string) : bool =
 ;;
 
 let part2 () =
-  (* Log.set_log_level Log.DEBUG; *)
+  (* Spice.set_log_level Spice.DEBUG; *)
   let lines = Utils.read_file input in
   let res =
     lines |> List.fold_left (fun acc x -> if parse_report_fault x then acc + 1 else acc) 0
   in
-  Log.info (Printf.sprintf "Result: %d" res)
+  Spice.info (Printf.sprintf "Result: %d" res)
 ;;
 
 part2 ()

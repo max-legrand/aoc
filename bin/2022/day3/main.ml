@@ -1,4 +1,4 @@
-Log.info "2022 Day 3"
+Spice.info "2022 Day 3"
 
 (* let input = "bin/2022/day3/data/test.txt" *)
 let input = "bin/2022/day3/data/puzzle.txt"
@@ -40,7 +40,7 @@ let parse_rucksack (line : string) : int =
 let part1 () =
   let lines = Utils.read_file input in
   let result = lines |> List.fold_left (fun acc x -> acc + parse_rucksack x) 0 in
-  Log.info (Printf.sprintf "Result=%d" result)
+  Spice.info (Printf.sprintf "Result=%d" result)
 ;;
 
 part1 ()
@@ -60,7 +60,7 @@ let parse_group_of_three (group : string list) : int =
                let freq = Hashtbl.find freqs x in
                if freq = 2
                then (
-                 Log.debug (Printf.sprintf "Similar_char=%c" x);
+                 Spice.debug (Printf.sprintf "Similar_char=%c" x);
                  acc + get_value_from_char x)
                else acc)
              else acc)
@@ -81,7 +81,7 @@ let parse_group_of_three (group : string list) : int =
   let str1 = String.of_seq (List.to_seq chars1) in
   let str2 = String.of_seq (List.to_seq chars2) in
   let str3 = String.of_seq (List.to_seq chars3) in
-  Log.debug (Printf.sprintf "Comparing %s, %s, %s" str1 str2 str3);
+  Spice.debug (Printf.sprintf "Comparing %s, %s, %s" str1 str2 str3);
   compare_lists chars1 chars2 chars3
 ;;
 
@@ -101,7 +101,7 @@ let part2 () =
   in
   let groups = split_into_groups [] lines in
   let result = List.fold_left (fun acc x -> acc + parse_group_of_three x) 0 groups in
-  Log.info (Printf.sprintf "Result=%d" result)
+  Spice.info (Printf.sprintf "Result=%d" result)
 ;;
 
 part2 ()

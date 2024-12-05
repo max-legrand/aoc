@@ -1,4 +1,4 @@
-Log.info "2024 Day 3"
+Spice.info "2024 Day 3"
 
 (* let input = "bin/2024/day3/data/test.txt" *)
 let input = "bin/2024/day3/data/puzzle.txt"
@@ -21,7 +21,7 @@ let parse_sequence (line : string) : int =
 
 let part1 () =
   let res = lines |> List.fold_left (fun acc line -> acc + parse_sequence line) 0 in
-  Log.info (Printf.sprintf "Result: %d" res)
+  Spice.info (Printf.sprintf "Result: %d" res)
 ;;
 
 part1 ()
@@ -59,7 +59,7 @@ let part2 () =
       parse_sequence (acc + res) xs state
   in
   let res, _ = parse_sequence 0 lines true in
-  Log.info (Printf.sprintf "Result: %d" res)
+  Spice.info (Printf.sprintf "Result: %d" res)
 ;;
 
 part2 ()

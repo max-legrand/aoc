@@ -1,4 +1,4 @@
-Log.info "2024 Day 4"
+Spice.info "2024 Day 4"
 
 (* let input = "bin/2024/day4/data/test.txt" *)
 let input = "bin/2024/day4/data/puzzle.txt"
@@ -78,11 +78,11 @@ let search_graph matrix =
       in
       match current with
       | 'X' ->
-        Log.debug (Printf.sprintf "Found X at %d,%d" row col);
+        Spice.debug (Printf.sprintf "Found X at %d,%d" row col);
         (match expand matrix row col rows cols None "X" with
          | 0 -> traverse new_point acc
          | x ->
-           Log.debug (Printf.sprintf "Found starting @ XMAS at %d,%d" row col);
+           Spice.debug (Printf.sprintf "Found starting @ XMAS at %d,%d" row col);
            traverse new_point (acc + x))
       | _ -> traverse new_point acc)
   in
@@ -90,11 +90,11 @@ let search_graph matrix =
 ;;
 
 let part1 () =
-  (* Log.set_log_level Log.DEBUG; *)
+  (* Spice.set_log_level Spice.DEBUG; *)
   let lines = Utils.read_file input in
   let matrix = List.map (fun x -> String.to_seq x |> List.of_seq) lines in
   let result = search_graph matrix in
-  Log.info (Printf.sprintf "Result: %d" result);
+  Spice.info (Printf.sprintf "Result: %d" result);
   ()
 ;;
 
@@ -147,7 +147,7 @@ let search_for_mas matrix =
       in
       match current with
       | 'A' ->
-        Log.debug (Printf.sprintf "Found A at %d,%d" row col);
+        Spice.debug (Printf.sprintf "Found A at %d,%d" row col);
         let new_result = check_for_cross matrix (row, col) in
         traverse new_point (new_result + acc)
       | _ -> traverse new_point acc)
@@ -156,11 +156,11 @@ let search_for_mas matrix =
 ;;
 
 let part2 () =
-  (* Log.set_log_level Log.DEBUG; *)
+  (* Spice.set_log_level Spice.DEBUG; *)
   let lines = Utils.read_file input in
   let matrix = List.map (fun x -> String.to_seq x |> List.of_seq) lines in
   let result = search_for_mas matrix in
-  Log.info (Printf.sprintf "Result: %d" result)
+  Spice.info (Printf.sprintf "Result: %d" result)
 ;;
 
 part2 ()

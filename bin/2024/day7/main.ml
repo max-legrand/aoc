@@ -18,6 +18,15 @@ let dec_to_bin (dec : int) =
   d2b dec []
 ;;
 
+let dec_to_tri (dec : int) =
+  let rec d2t y lst =
+    match y with
+    | 0 -> lst
+    | _ -> d2t (y / 3) ((y % 3) :: lst)
+  in
+  d2t dec []
+;;
+
 let pad_to_length ~(target_length : int) ~bin =
   let rec helper ~(acc : int list) =
     if List.length acc = target_length then acc else helper ~acc:(0 :: acc)
@@ -25,19 +34,27 @@ let pad_to_length ~(target_length : int) ~bin =
   helper ~acc:bin
 ;;
 
-let generate_combinations max_number =
-  let total = 2 ** max_number in
+let generate_combinations max_number ~is_tri =
+  let total =
+    match is_tri with
+    | false -> 2 ** max_number
+    | true -> 3 ** max_number
+  in
   let rec helper ~(acc : int list list) ~(current : int) =
     if current >= total
     then acc
     else (
-      let values = pad_to_length ~target_length:max_number ~bin:(dec_to_bin current) in
+      let values =
+        match is_tri with
+        | false -> pad_to_length ~target_length:max_number ~bin:(dec_to_bin current)
+        | true -> pad_to_length ~target_length:max_number ~bin:(dec_to_tri current)
+      in
       helper ~acc:(values :: acc) ~current:(current + 1))
   in
   helper ~acc:[] ~current:0
 ;;
 
-let process_line (line : string) =
+let process_line (line : string) ~is_tri =
   let idx =
     match Base.String.substr_index ~pos:0 line ~pattern:": " with
     | Some x -> x
@@ -59,15 +76,15 @@ let process_line (line : string) =
     "total=%d - %s"
     total
     (String.concat ~sep:"," (List.of_array numbers |> List.map ~f:Int.to_string));
-  let combinations = generate_combinations (Array.length numbers - 1) in
-  combinations
-  |> List.iter ~f:(fun combination ->
-    Stdio.print_string "[";
-    combination
-    |> List.iter ~f:(fun item ->
-      Stdio.printf "%d" item;
-      Stdio.print_string ",");
-    Stdio.print_string "]\n");
+  let combinations = generate_combinations (Array.length numbers - 1) ~is_tri in
+  (* combinations *)
+  (* |> List.iter ~f:(fun combination -> *)
+  (*   Stdio.print_string "["; *)
+  (*   combination *)
+  (*   |> List.iter ~f:(fun item -> *)
+  (*     Stdio.printf "%d" item; *)
+  (*     Stdio.print_string ","); *)
+  (*   Stdio.print_string "]\n"); *)
   match
     List.fold combinations ~init:false ~f:(fun acc item ->
       let result =
@@ -75,6 +92,11 @@ let process_line (line : string) =
           match item with
           | 0 -> acc2 * numbers.(idx + 1)
           | 1 -> acc2 + numbers.(idx + 1)
+          | 2 ->
+            let current_string = Int.to_string acc2 in
+            let new_string = Int.to_string numbers.(idx + 1) in
+            let new_val = String.concat ~sep:"" [ current_string; new_string ] in
+            Int.of_string new_val
           | _ -> failwith "Invalid value")
       in
       if result = total then true else acc)
@@ -84,11 +106,28 @@ let process_line (line : string) =
 ;;
 
 let part1 () =
-  Spice.set_log_level Spice.DEBUG;
+  (* Spice.set_log_level Spice.DEBUG; *)
   let data = Utils.read_file input in
-  let value = List.fold ~init:0 ~f:(fun acc line -> acc + process_line line) data in
+  let value =
+    List.fold ~init:0 ~f:(fun acc line -> acc + process_line line ~is_tri:false) data
+  in
   Spice.infof "Result=%d" value;
   ()
 ;;
 
 part1 ()
+
+(*
+   Part 2 has added a new operation available, which means our approach of
+   using binary to represent the choices no longer works
+*)
+
+let part2 () =
+  let data = Utils.read_file input in
+  let value =
+    List.fold ~init:0 ~f:(fun acc line -> acc + process_line line ~is_tri:true) data
+  in
+  Spice.infof "Result=%d" value
+;;
+
+part2 ()

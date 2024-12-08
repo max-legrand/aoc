@@ -1,0 +1,5 @@
+(executable
+ (public_name aoc_2024_day6)
+ (name main)
+ (libraries spice utils base core re unix lwt lwt.unix stdio)
+ (preprocess (pps ppx_jane)))

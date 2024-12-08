@@ -89,15 +89,18 @@ let process_line (line : string) ~is_tri =
     List.fold combinations ~init:false ~f:(fun acc item ->
       let result =
         List.foldi item ~init:numbers.(0) ~f:(fun idx acc2 item ->
-          match item with
-          | 0 -> acc2 * numbers.(idx + 1)
-          | 1 -> acc2 + numbers.(idx + 1)
-          | 2 ->
-            let current_string = Int.to_string acc2 in
-            let new_string = Int.to_string numbers.(idx + 1) in
-            let new_val = String.concat ~sep:"" [ current_string; new_string ] in
-            Int.of_string new_val
-          | _ -> failwith "Invalid value")
+          if acc2 > total
+          then acc2
+          else (
+            match item with
+            | 0 -> acc2 * numbers.(idx + 1)
+            | 1 -> acc2 + numbers.(idx + 1)
+            | 2 ->
+              let current_string = Int.to_string acc2 in
+              let new_string = Int.to_string numbers.(idx + 1) in
+              let new_val = String.concat ~sep:"" [ current_string; new_string ] in
+              Int.of_string new_val
+            | _ -> failwith "Invalid value"))
       in
       if result = total then true else acc)
   with
@@ -131,3 +134,7 @@ let part2 () =
 ;;
 
 part2 ()
+
+(* TODO: I'd like to try a different approach to this problem in the future.
+   Maybe taking a greedy approach instead of testing every combination.
+*)

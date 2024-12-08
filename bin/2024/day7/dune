@@ -1,0 +1,4 @@
+(executable
+ (public_name aoc_2024_day7)
+ (name main)
+ (libraries spice utils base core re unix lwt lwt.unix stdio))

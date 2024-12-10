@@ -1,0 +1,6 @@
+(executable
+ (public_name aoc_2024_day10)
+ (name main)
+ (modes exe byte)
+ (flags (:standard -g))
+ (libraries spice utils base core re unix lwt lwt.unix stdio))

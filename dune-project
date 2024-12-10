@@ -13,11 +13,23 @@
 
 (license MIT)
 
+(wrapped_executables false)
+
 (package
  (name aoc)
  (synopsis "Advent of Code solutions")
  (description "Advent of Code solutions in OCaml")
- (depends ocaml dune stdio base core re lwt core_unix)
+ (depends
+   ocaml
+   dune
+   stdio
+   base
+   core
+   re
+   lwt
+   core_unix
+   utop
+   )
 )
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

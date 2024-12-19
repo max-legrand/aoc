@@ -29,6 +29,7 @@
    lwt
    core_unix
    utop
+   ppx_deriving
    )
 )
 

@@ -17,6 +17,7 @@ depends: [
   "lwt"
   "core_unix"
   "utop"
+  "ppx_deriving"
   "odoc" {with-doc}
 ]
 build: [

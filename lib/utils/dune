@@ -1,3 +1,3 @@
 (library
  (name utils)
- (libraries base unix stdio))
+ (libraries base spice core unix stdio))

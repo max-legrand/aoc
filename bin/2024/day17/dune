@@ -1,0 +1,8 @@
+(executable
+ (public_name aoc_2024_day17)
+ (name main)
+ (modes exe byte)
+ (flags (:standard -g))
+ (libraries spice utils base core re unix lwt lwt.unix stdio str)
+ (preprocess (pps ppx_jane ppx_deriving.enum))
+ )

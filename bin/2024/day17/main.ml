@@ -111,7 +111,7 @@ let parse_register line =
 (* Part 1 requires us to run through some operations on a 3-bit computer *)
 let part1 () =
   (* Spice.set_log_level Spice.DEBUG; *)
-  let data = List.rev (Utils.read_file input) in
+  let data = Utils.read_file input in
   let regA = parse_register (List.nth_exn data 0) in
   let regB = parse_register (List.nth_exn data 1) in
   let regC = parse_register (List.nth_exn data 2) in
@@ -154,7 +154,7 @@ let solve a program =
 
 let part2 () =
   (* Spice.set_log_level Spice.DEBUG; *)
-  let data = List.rev (Utils.read_file input) in
+  let data = Utils.read_file input in
   let program_items = Str.split_delim (Str.regexp_string ": ") (List.nth_exn data 4) in
   let program = List.nth_exn program_items 1 in
   let regA = solve 0 program in

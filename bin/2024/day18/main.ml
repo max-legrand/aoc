@@ -78,7 +78,7 @@ let find_min_path () =
 
 let part1 () =
   (* Spice.set_log_level Spice.DEBUG; *)
-  let data = List.rev (Utils.read_file input) in
+  let data = Utils.read_file input in
   map := Array.make_matrix ~dimx:rows ~dimy:cols '.';
   set_map data 1024;
   !map.(start.(0)).(start.(1)) <- '@';
@@ -103,7 +103,7 @@ let build_and_search data iters =
 
 let part2 () =
   Spice.set_log_level Spice.DEBUG;
-  let data = List.rev (Utils.read_file input) in
+  let data = Utils.read_file input in
   let rec bin_search start end_ =
     if start >= end_
     then start

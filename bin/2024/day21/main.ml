@@ -114,7 +114,7 @@ let calculate_score code length =
    in the shortest amount of movements possible. My thought process here was to build a mapping of the shortest path from each point to each goal
    and then generate the combinations until we reach the end of the chain.
 *)
-let part1 () =
+let _part1 () =
   (* Spice.set_log_level Spice.DEBUG; *)
   let data = Utils.read_file input in
   let result =
@@ -154,16 +154,75 @@ let part1 () =
   Spice.infof "Result: %d" result
 ;;
 
-part1 ()
-
-let compute_length_cache = Hashtbl.Poly.create ()
-
-let compute_length from_char to_char depth =
-  match Hashtbl.find compute_length_cache (from_char, to_char, depth) with
-  | Some result -> result
-  | None -> if depth = 1 then Hashtbl.find_exn remote_sequences (from_char, to_char)
-;;
 (*
    For part 2, we need to extend the chain to 25 passes. This will obviously explode our code so a new approach needs to be found.
    A memoization approach will probably be necessary coupled with using DFS instead of BFS.
 *)
+
+let compute_length_cache = Hashtbl.Poly.create ()
+
+let remote_lengths =
+  Hashtbl.map remote_sequences ~f:(fun data -> List.nth_exn data 0 |> String.length)
+;;
+
+(* Recursive function to compute minimum path length for a sequence at a given depth *)
+let rec compute_length sequence depth =
+  match Hashtbl.find compute_length_cache (sequence, depth) with
+  | Some result -> result
+  | None ->
+    let result =
+      if depth = 1
+      then (
+        (* Base case - directly use remote_lengths *)
+        let transitions =
+          List.zip_exn
+            ('A' :: String.to_list sequence
+             |> List.sub ~pos:0 ~len:(String.length sequence))
+            (String.to_list sequence)
+        in
+        List.fold transitions ~init:0 ~f:(fun acc (x, y) ->
+          acc + Hashtbl.find_exn remote_lengths (x, y)))
+      else (
+        (* Recursive case - compute minimum length for each transition *)
+        let transitions =
+          List.zip_exn
+            ('A' :: String.to_list sequence
+             |> List.sub ~pos:0 ~len:(String.length sequence))
+            (String.to_list sequence)
+        in
+        List.fold transitions ~init:0 ~f:(fun acc (x, y) ->
+          let subsequences = Hashtbl.find_exn remote_sequences (x, y) in
+          let min_subseq_len =
+            List.fold subsequences ~init:Int.max_value ~f:(fun min_len subseq ->
+              min min_len (compute_length subseq (depth - 1)))
+          in
+          acc + min_subseq_len))
+    in
+    Hashtbl.add_exn compute_length_cache ~key:(sequence, depth) ~data:result;
+    result
+;;
+
+let part2 () =
+  Spice.set_log_level Spice.DEBUG;
+  let data = Utils.read_file input in
+  let result =
+    data
+    |> List.fold ~init:0 ~f:(fun acc line ->
+      (* Get all possible initial sequences from the number pad *)
+      let inputs = List.map (solve line number_sequences) ~f:(String.concat ~sep:"") in
+      Spice.debugf "Initial sequences:";
+      List.iter inputs ~f:(fun option -> Spice.debugf "%s" option);
+      (* Find minimum length among all possible starting sequences *)
+      let min_length = ref Int.max_value in
+      List.iter inputs ~f:(fun input ->
+        let length = compute_length input 25 in
+        min_length := min !min_length length);
+      (* Calculate final score *)
+      let score = calculate_score line !min_length in
+      Spice.debugf "Line %s - Min length: %d, Score: %d" line !min_length score;
+      acc + score)
+  in
+  Spice.infof "Final result: %d" result
+;;
+
+part2 ()

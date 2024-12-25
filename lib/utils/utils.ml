@@ -55,3 +55,11 @@ let print_map map =
     in
     Spice.debugf "%s" row_string)
 ;;
+
+let print_array_string array =
+  "[" ^ (array |> Array.to_list |> String.concat ~sep:",") ^ "]"
+;;
+
+let print_array array = Spice.debugf "%s" (array |> print_array_string)
+let print_list_string lst = "[" ^ (lst |> String.concat ~sep:",") ^ "]"
+let print_list lst = Spice.debugf "%s" (lst |> print_list_string)

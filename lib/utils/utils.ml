@@ -23,7 +23,7 @@ let print_str_lines (lines : string list) : unit = List.iter ~f:print_endline li
 let print_int_lines (lines : int list) : unit = List.iter ~f:(Printf.printf "%d\n") lines
 
 let read_file_single (filename : string) : string =
-  _read_file_inner filename |> String.concat ~sep:"\n"
+  _read_file_inner filename |> List.rev |> String.concat ~sep:"\n"
 ;;
 
 module PrioQ = struct

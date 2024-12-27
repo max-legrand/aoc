@@ -2,9 +2,10 @@ open Core
 open Utils
 
 let () = Spice.info "2024 Day 23"
-let input = "bin/2024/day23/data/smalltest.txt"
+
+(* let input = "bin/2024/day23/data/smalltest.txt" *)
 (* let input = "bin/2024/day23/data/test.txt" *)
-(* let input = "bin/2024/day23/data/puzzle.txt" *)
+let input = "bin/2024/day23/data/puzzle.txt"
 
 let parse_adj_list text =
   let lines = String.split_lines text in
@@ -90,29 +91,42 @@ let neighbors adj v =
   | Some vs -> Hash_set.Poly.of_list vs
 ;;
 
-(* Return the intersection between a set and a list of items *)
-let intersection set lst =
-  let second_set = Hash_set.Poly.of_list lst in
-  let intersection = Hash_set.Poly.inter set second_set in
-  intersection
+let rec bron_kerbosch ~adj ~r ~p ~x ~all =
+  if Hash_set.is_empty p && Hash_set.is_empty x
+  then (
+    let clique = Hash_set.to_list r |> List.sort ~compare:String.compare in
+    all := clique :: !all)
+  else (
+    let p_list = Hash_set.to_list p in
+    p_list
+    |> List.iter ~f:(fun v ->
+      let next_v = neighbors adj v in
+      let p' = Hash_set.copy p in
+      Hash_set.filter_inplace p' ~f:(fun u -> Hash_set.mem next_v u);
+      let x' = Hash_set.copy x in
+      Hash_set.filter_inplace x' ~f:(fun u -> Hash_set.mem next_v u);
+      Hash_set.add r v;
+      bron_kerbosch ~adj ~r ~p:p' ~x:x' ~all;
+      Hash_set.remove r v;
+      Hash_set.remove p v;
+      Hash_set.remove x v))
 ;;
-
-let bron_kerbosch ~adj ~r ~p ~x ~all = ()
 
 let part2 () =
   Spice.set_log_level Spice.DEBUG;
   let data = read_file_single input in
   let adj = parse_adj_list data in
-  let connected_groups = find_groups adj in
+  let all_vertices = Hashtbl.keys adj |> Hash_set.Poly.of_list in
+  let r = Hash_set.Poly.create () in
+  let p = Hash_set.copy all_vertices in
+  let x = Hash_set.Poly.create () in
+  let all = ref [] in
+  bron_kerbosch ~adj ~r ~p ~x ~all;
   let largest =
-    Hash_set.fold ~init:(Hash_set.Poly.create ()) connected_groups ~f:(fun acc group ->
-      if Hash_set.length group > Hash_set.length acc then group else acc)
+    List.fold !all ~init:[] ~f:(fun acc clique ->
+      if List.length clique > List.length acc then clique else acc)
   in
-  largest
-  |> Hash_set.to_list
-  |> List.sort ~compare:String.compare
-  |> print_list_string
-  |> Spice.debugf "%s"
+  Spice.infof "Largest clique: %s" (String.concat ~sep:"," largest)
 ;;
 
 part2 ()

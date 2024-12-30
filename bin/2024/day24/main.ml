@@ -2,8 +2,9 @@ open Core
 open Utils
 
 let () = Spice.info "2024 Day 24"
-let input = "bin/2024/day24/data/test2.txt"
-(* let input = "bin/2024/day24/data/puzzle.txt" *)
+
+(* let input = "bin/2024/day24/data/test2.txt" *)
+let input = "bin/2024/day24/data/puzzle.txt"
 
 let init_state data =
   let sections = Str.split (Str.regexp_string "\n\n") data in
@@ -37,7 +38,7 @@ let process_instruction ~instruction ~state =
   let op = Re.Group.get m 2 in
   let reg2 = Re.Group.get m 3 in
   let target = Re.Group.get m 4 in
-  Spice.debugf "reg1: %s - op: %s - reg2: %s - output: %s" reg1 op reg2 target;
+  (* Spice.debugf "reg1: %s - op: %s - reg2: %s - output: %s" reg1 op reg2 target; *)
   let reg1_value = Hashtbl.Poly.find_exn state reg1 in
   let reg2_value = Hashtbl.Poly.find_exn state reg2 in
   let result = get_result op reg1_value reg2_value in
@@ -92,115 +93,84 @@ let part1 () =
 
 part1 ()
 
-let generate_x ~state = __generate_number ~state ~filter:'x'
-let generate_y ~state = __generate_number ~state ~filter:'y'
-
-let num_to_bin num =
-  let rec helper acc num =
-    match num with
-    | 0 -> acc
-    | x when x > 0 -> helper ((x % 2) :: acc) (x / 2)
-    | _ -> failwith "Invalid number"
-  in
-  helper [] num
-;;
-
-let pad_list length list =
-  let rec helper acc = if List.length acc = length then acc else helper (0 :: acc) in
-  helper list
-;;
-
-let diff_idx l1 l2 =
-  let zip = List.zip_exn l1 l2 in
-  zip
-  |> List.foldi ~init:[] ~f:(fun idx acc item ->
-    let i1, i2 = item in
-    if i1 <> i2 then idx :: acc else acc)
-;;
-
-let find_candidates diffs instructions_string =
-  let instructions = String.split_lines instructions_string in
-  let items = Hash_set.Poly.create () in
-  diffs |> List.iter ~f:(fun idx -> Hash_set.Poly.add items (Printf.sprintf "z%02d" idx));
-  let added = ref false in
-  let seen = Hash_set.Poly.create () in
-  let first = ref true in
-  while !first || !added do
-    first := false;
-    added := false;
-    instructions
-    |> List.iter ~f:(fun line ->
-      if Hash_set.Poly.mem seen line
-      then ()
-      else (
-        let to_add_items = ref [] in
-        items
-        |> Hash_set.Poly.iter ~f:(fun item ->
-          if String.is_substring line ~substring:item
-          then (
-            let reg = Re.Pcre.regexp {|(.*) (AND|OR|XOR) (.*) -> (.*)|} in
-            let matches = Re.all reg line in
-            assert (List.length matches = 1);
-            let m = List.hd_exn matches in
-            let reg1 = Re.Group.get m 1 in
-            let reg2 = Re.Group.get m 3 in
-            let target = Re.Group.get m 4 in
-            let contains_target = Hash_set.mem items target in
-            let target_start_char = Array.get (target |> String.to_array) 0 in
-            Spice.debugf "target: %s" target;
-            if (Char.equal target_start_char 'z' && contains_target)
-            || not (Char.equal target_start_char 'z')
-            then (
-              to_add_items := List.append !to_add_items [ reg1; reg2; target ];
-              added := true)));
-        if List.length !to_add_items > 0
-        then (
-          Hash_set.Poly.add seen line;
-          List.iter !to_add_items ~f:(fun item -> Hash_set.Poly.add items item))))
-  done;
-  seen
-;;
-
-type output_reg =
-  { operation : string
-  ; reg1 : string
-  ; reg2 : string
+type operation =
+  { operand1 : string
+  ; operation : string
+  ; operand2 : string
+  ; result : string
   }
 
-let build_adj instructions =
-  let adj = Hashtbl.Poly.create () in
-  List.iter (String.split_lines instructions) ~f:(fun line ->
-    let reg = Re.Pcre.regexp {|(.*) (AND|OR|XOR) (.*) -> (.*)|} in
-    let matches = Re.all reg line in
-    assert (List.length matches = 1);
-    let m = List.hd_exn matches in
-    let reg1 = Re.Group.get m 1 in
-    let reg2 = Re.Group.get m 3 in
-    let op = Re.Group.get m 2 in
-    let target = Re.Group.get m 4 in
-    Hashtbl.Poly.add_exn adj ~key:target ~data:{ operation = op; reg1; reg2 });
-  adj
+let parse_line line =
+  let reg = Re.Pcre.regexp {|(.*) (AND|OR|XOR) (.*) -> (.*)|} in
+  let matches = Re.all reg line in
+  assert (List.length matches = 1);
+  let m = List.hd_exn matches in
+  let reg1 = Re.Group.get m 1 in
+  let op = Re.Group.get m 2 in
+  let reg2 = Re.Group.get m 3 in
+  let target = Re.Group.get m 4 in
+  { operand1 = reg1; operation = op; operand2 = reg2; result = target }
 ;;
+
+let parse_operations input = input |> String.split_lines |> List.map ~f:parse_line
+
+let find_highest_z operations =
+  List.fold operations ~init:"z00" ~f:(fun acc op ->
+    if not (Char.equal (op.result |> String.to_array).(0) 'z')
+    then acc
+    else (
+      let acc_z_num =
+        acc |> String.sub ~pos:1 ~len:(String.length acc - 1) |> Int.of_string
+      in
+      let op_z_num =
+        op.result |> String.sub ~pos:1 ~len:(String.length op.result - 1) |> Int.of_string
+      in
+      if op_z_num > acc_z_num then op.result else acc))
+;;
+
+let not_xyz reg =
+  let first_character = (String.to_array reg).(0) in
+  (not (Char.equal first_character 'x'))
+  && (not (Char.equal first_character 'y'))
+  && not (Char.equal first_character 'z')
+;;
+
+let has_x00 reg1 reg2 = String.equal reg1 "x00" || String.equal reg2 "x00"
 
 let part2 () =
   let data = read_file_single input in
-  let state, instructions = init_state data in
-  let x = generate_x ~state in
-  let y = generate_y ~state in
-  process_instructions ~state ~instructions;
-  let z = generate_number ~state in
-  Spice.infof "Expected; %d + %d = %d; got %d + %d = %d" x y (x + y) x y z;
-  Spice.set_log_level Spice.DEBUG;
-  let z_binary = num_to_bin z in
-  let expected_z = num_to_bin (x + y) |> pad_list (List.length z_binary) in
-  print_list (z_binary |> List.map ~f:Int.to_string);
-  print_list (expected_z |> List.map ~f:Int.to_string);
-  let diffs = diff_idx z_binary expected_z in
-  print_list (diffs |> List.map ~f:Int.to_string);
-  let candidates = find_candidates diffs instructions in
-  Hash_set.Poly.iter candidates ~f:(fun candidate ->
-    Spice.debugf "Candidate: %s" candidate)
-  (* Printing out the candidates, we can see there are 3 instances of a Z bit not being set using XOR *)
+  let _wires, instructions_string = init_state data in
+  let operations = parse_operations instructions_string in
+  let highest_z = find_highest_z operations in
+  let wrong = Hash_set.Poly.create () in
+  List.iter operations ~f:(fun op ->
+    if Char.equal (op.result |> String.to_array).(0) 'z'
+    && (not (String.equal op.operation "XOR"))
+    && not (String.equal op.result highest_z)
+    then Hash_set.add wrong op.result;
+    if String.equal op.operation "XOR"
+    && not_xyz op.operand1
+    && not_xyz op.operand2
+    && not_xyz op.result
+    then Hash_set.add wrong op.result;
+    if String.equal op.operation "AND" && not (has_x00 op.operand1 op.operand2)
+    (* Changed this condition *)
+    then
+      List.iter operations ~f:(fun op2 ->
+        if (String.equal op.result op2.operand1 || String.equal op.result op2.operand2)
+        && not (String.equal op2.operation "OR")
+           (* Changed this condition *)
+        then Hash_set.add wrong op.result);
+    if String.equal op.operation "XOR"
+    then
+      List.iter operations ~f:(fun op2 ->
+        if (String.equal op.result op2.operand1 || String.equal op.result op2.operand2)
+        && String.equal op2.operation "OR"
+        then Hash_set.add wrong op.result));
+  let result =
+    String.concat ~sep:"," (Hash_set.to_list wrong |> List.sort ~compare:String.compare)
+  in
+  Spice.infof "Result: %s" result
 ;;
 
 part2 ()
